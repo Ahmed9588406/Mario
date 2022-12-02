@@ -1,0 +1,50 @@
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	
++++ b/main.py	(date 1667821894673)
+@@ -40,17 +40,41 @@
+ from gym.wrappers import FrameStack, GrayScaleObservation
+ 
+ # Import Vectorization Wrappers
++# VecFrameStack : to make us deal with FrameStack
+ from stable_baselines3.common.vec_env import VecFrameStack, DummyVecEnv
+ 
+ # import Matplotlib to show the impact of frame stacking
+ from matplotlib import pyplot as plt
+ 
+ 
++# 1. Create the base environment
++env = gym_super_mario_bros.make('SuperMarioBros-v0')
++
++# 2. Simplify the controls
++env = JoypadSpace(env,SIMPLE_MOVEMENT)
+ 
++# 3. Graystyle
++env = GrayScaleObservation(env, keep_dim=True)
+ 
++# 4. Wrap inside the Dummy Environment
++env = DummyVecEnv([lambda: env])
+ 
++# 5. Stack the frames
++# channels_order : this make the last order as i give it 4 ex: state = env.reset() state = env.reset()
++# the output will be (1,240,256,4) 4 is the last order and the number of frames the we will stack an make the model learn on
++env = VecFrameStack(env, 4, channels_order='last')# this wil be a good number of frames to train
+ 
++"""
++state = env.reset()
+ 
++state, reward, done, info = env.step([5])
++
++plt.figure(figsize=(20, 16))
++for idx in range(state.shape[3]):
++    plt.subplot(1, 4, idx+1)
++    plt.imshow(state[0][:, :, idx])
++plt.show()
++"""
+ 
+ 
+ 
